@@ -1,0 +1,106 @@
+@prefix : <http://example.org/universite#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontologie
+############################
+:OntoUniversite a owl:Ontology .
+
+############################
+# Classes
+############################
+:Individu a owl:Class .
+:Apprenant a owl:Class ; rdfs:subClassOf :Individu .
+:Enseignant a owl:Class ; rdfs:subClassOf :Individu .
+:Universite a owl:Class .
+:Filiere a owl:Class .
+:Cours a owl:Class .
+
+# Classes disjointes
+:Apprenant owl:disjointWith :Enseignant .
+
+############################
+# Propriétés Objet
+############################
+:etudieA a owl:ObjectProperty ;
+  rdfs:domain :Apprenant ;
+  rdfs:range :Universite .
+
+:donneCours a owl:ObjectProperty ;
+  rdfs:domain :Enseignant ;
+  rdfs:range :Cours .
+
+:faitPartieDe a owl:ObjectProperty ;
+  rdfs:domain :Cours ;
+  rdfs:range :Filiere .
+
+:affecteA a owl:ObjectProperty ;
+  rdfs:domain :Enseignant ;
+  rdfs:range :Filiere .
+
+############################
+# Propriétés de Données
+############################
+:nomComplet a owl:DatatypeProperty ;
+  rdfs:domain :Individu ;
+  rdfs:range xsd:string .
+
+:codeEtudiant a owl:DatatypeProperty ;
+  rdfs:domain :Apprenant ;
+  rdfs:range xsd:string .
+
+:codeProf a owl:DatatypeProperty ;
+  rdfs:domain :Enseignant ;
+  rdfs:range xsd:string .
+
+############################
+# Restrictions
+############################
+
+# Apprenant étudieA exactement 1 Universite
+:Apprenant rdfs:subClassOf [
+  a owl:Restriction ;
+  owl:onProperty :etudieA ;
+  owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+  owl:onClass :Universite
+] .
+
+# Cours faitPartieDe exactement 1 Filiere
+:Cours rdfs:subClassOf [
+  a owl:Restriction ;
+  owl:onProperty :faitPartieDe ;
+  owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+  owl:onClass :Filiere
+] .
+
+# Enseignant donneCours au moins 1 Cours
+:Enseignant rdfs:subClassOf [
+  a owl:Restriction ;
+  owl:onProperty :donneCours ;
+  owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+  owl:onClass :Cours
+] .
+
+############################
+# Individus (Exemples)
+############################
+:ENSA_Khouribga a :Universite .
+
+:IID a :Filiere .
+
+:IntelligenceArtificielle a :Cours ;
+  :faitPartieDe :IID .
+
+:Saad a :Apprenant ;
+  :nomComplet "SAAD AFIFI" ;
+  :codeEtudiant "BHU78910" ;
+  :etudieA :ENSA_Khouribga .
+
+:ProfSamir a :Enseignant ;
+  :nomComplet "Samir Haddad" ;
+  :codeProf "EN41" ;
+  :affecteA :IID ;
+  :donneCours :IntelligenceArtificielle .
